@@ -1,0 +1,193 @@
+#include <esp_now.h>
+#include <DHT.h>
+#include <WiFi.h>
+
+static const int SENSOR_NUM = 24;
+
+static const int MUX_PIN_S0 = 32;
+static const int MUX_PIN_S1 = 33;
+static const int MUX_PIN_S2 = 25;
+
+static const int DHT_PIN_1 = 26;
+static const int DHT_PIN_2 = 27;
+static const int DHT_PIN_3 = 14;
+
+unsigned long previousMillis = 0;
+const long interval = 10000;
+
+uint8_t masterMAC[] = {0xB0, 0xA7, 0x32, 0xC8, 0x15, 0xD0};
+
+DHT dhtSensors[SENSOR_NUM] = {
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_1, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_2, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22},
+  {DHT_PIN_3, DHT22}
+};
+
+struct SensorData {
+  int8_t id;
+  float temperature;
+  float humidity;
+};
+
+struct SendData {
+  int8_t id;
+  int16_t temperature;
+  int16_t humidity; 
+};
+
+
+SensorData sensorData[24];
+SendData sendData[24];
+
+esp_now_peer_info_t peerInfo;
+
+void Reset_SensorData() {
+  Serial.println("Reset SensorData!");
+  for (int i = 0; i < 24; i++) {
+    sensorData[i].id = 0;
+    sensorData[i].temperature = 0;
+    sensorData[i].humidity = 0;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(MUX_PIN_S0, OUTPUT);
+  pinMode(MUX_PIN_S1, OUTPUT);
+  pinMode(MUX_PIN_S2, OUTPUT);
+
+  digitalWrite(MUX_PIN_S0, LOW);
+  digitalWrite(MUX_PIN_S1, LOW);
+  digitalWrite(MUX_PIN_S2, LOW);
+
+  for (int i = 0; i < 8; i++) {
+    // 센서 선택
+    digitalWrite(MUX_PIN_S0, (i & 0x01) ? HIGH : LOW);
+    digitalWrite(MUX_PIN_S1, (i & 0x02) ? HIGH : LOW);
+    digitalWrite(MUX_PIN_S2, (i & 0x04) ? HIGH : LOW);
+
+    // 센서 초기화
+    dhtSensors[i] = DHT(DHT_PIN_1, DHT22);
+    dhtSensors[i + 8] = DHT(DHT_PIN_2, DHT22);
+    dhtSensors[i + 16] = DHT(DHT_PIN_3, DHT22);
+
+    dhtSensors[i].begin();
+    dhtSensors[i + 8].begin();
+    dhtSensors[i + 16].begin();
+
+    Serial.print("Sensor Initialize...(");
+    Serial.print(i);
+    Serial.println(" / 8)");
+
+    delay(1000);
+  }
+
+  
+
+  // wifi station mode 설정
+  WiFi.mode(WIFI_STA);
+
+  // esp-now 초기설정
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error Initializing ESP_NOW");
+    return;
+  }
+  else {
+    Serial.println("ESP-OK");
+  }
+
+  // 패킷 전송 상태를 보기 위한 콜백함수 지정
+  esp_now_register_send_cb(OnDataSent);
+
+  // 통신 mac주소, 채널, 암호화 설정
+  memcpy(peerInfo.peer_addr, masterMAC, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println(esp_now_add_peer(&peerInfo));
+    ESP.restart();
+  }
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    for (int i = 0; i < 8; i++) {
+      // i에 따라 Mux 제어선 신호 결정
+      digitalWrite(MUX_PIN_S0, (i & 0x01) ? HIGH : LOW);
+      digitalWrite(MUX_PIN_S1, (i & 0x02) ? HIGH : LOW);
+      digitalWrite(MUX_PIN_S2, (i & 0x04) ? HIGH : LOW);
+
+      delay(500);
+
+      sensorData[i].id = i + 1;  
+      sensorData[i].humidity = dhtSensors[i].readHumidity();
+      sensorData[i].temperature = dhtSensors[i].readTemperature();
+      sensorData[i + 8].id = i + 9;
+      sensorData[i + 8].humidity = dhtSensors[i + 8].readHumidity();
+      sensorData[i + 8].temperature = dhtSensors[i + 8].readTemperature();
+      sensorData[i + 16].id = i + 17;
+      sensorData[i + 16].humidity = dhtSensors[i + 16].readHumidity();
+      sensorData[i + 16].temperature = dhtSensors[i + 16].readTemperature();      
+
+      Serial.print("Reading Sensor Value... ( ");
+      Serial.print(i);
+      Serial.println(" / 8 )");
+
+      delay(500);
+    }
+
+    for (int i = 0; i < 24; i++){
+      if (!isnan(sensorData[i].temperature) && !isnan(sensorData[i].humidity)){
+        sendData[i].id = sensorData[i].id;
+        sendData[i].temperature = int(sensorData[i].temperature * 10);
+        sendData[i].humidity = int(sensorData[i].humidity * 10);
+      } else{
+        sendData[i].id = sensorData[i].id;
+        sendData[i].temperature = -999;
+        sendData[i].humidity = -999;
+      }
+    }
+
+    for (int i = 0; i < 24; i++) {
+      Serial.print("Sensor_");
+      Serial.print(i);
+      Serial.print("\t Temperature : ");
+      Serial.print(sendData[i].temperature / 10.0);
+      Serial.print("\t Humidity : ");
+      Serial.println(sendData[i].humidity / 10.0);
+    }
+    Serial.print("sizeof(sendData) : ");
+    Serial.println(sizeof(sendData));
+    esp_err_t result = esp_now_send(masterMAC, (uint8_t *)&sendData, sizeof(sendData));
+    Reset_SensorData();
+  }
+}
+
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
