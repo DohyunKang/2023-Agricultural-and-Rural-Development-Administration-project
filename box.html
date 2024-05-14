@@ -1,0 +1,635 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Honey Bee Sensor Data</title>
+    <meta http-equiv="refresh" content="60*1"> <!--1min-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="navbar.css">
+    <link rel="stylesheet" type="text/css" href="font_size.css">
+    <link rel="stylesheet" href="css/site.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        p {
+            margin: 5px 0px;
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        div[class^="col"] {
+            padding: 20px;
+            border: 1px solid #FFFFFF;
+            background-color: #ffffff;
+        }
+
+        .nav-pills>.nav-item>.active {
+            color: rgb(255, 255, 255) !important;
+        }
+    </style>
+
+    <div class="container text-right rounded font-weight-bold">
+        <p id="show"></p>
+        <script>
+            function d_clock() {
+                var d_t = new Date();
+                var month = d_t.getMonth();
+                var date = d_t.getDate();
+                var day = d_t.getDay();
+                var week = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+                var hours = String(d_t.getHours()).padStart(2, "0");
+                var minutes = String(d_t.getMinutes()).padStart(2, "0");
+                var seconds = String(d_t.getSeconds()).padStart(2, "0");
+                document.getElementById("show").innerHTML = (month + 1) + "/" + date + " " + week[day] + " " + hours + ":" + minutes + ":" + seconds;
+            }
+            d_clock();
+            setInterval(d_clock, 1000);
+        </script>
+    </div>
+</head>
+
+<body>
+    <div class="header">
+        <div class="text-center">
+            </br>
+            <a class="header_ANDONG" href="https://www.andong.ac.kr" target="_blank">
+                <img src="image/andong_univ.jpg" width="auto" height="80" title="안동대학교 홈페이지"></a>
+            </br></br>
+            <!-- 아래 하이퍼링크에 서버 주소 넣어야 함 -->
+            <a class="headr_CRCIV" href="http://kjh1131.dothome.co.kr" target="_blank">
+                <img src="image/Sensor_data.jpg" height="80" width="auto" title="Bee sensor data"></a>
+            </br></br>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+
+                <!--Nav tabs-->
+                <nav class="nav nav-pills nav-fill bg-warning rounded text-center" id="myTab" role="tablist">
+                    <a class="nav-item nav-link" href="http://kjh1131.dothome.co.kr" target="_self">홈</a>
+                    <a class="nav-item nav-link" id="Module1-tab" data-toggle="tab" href="#Module1" role="tab" aria-controls="Module1" aria-selected="false">벌통 1</a>
+                    <a class="nav-item nav-link" id="Module2-tab" data-toggle="tab" href="#Module2" role="tab" aria-controls="Module2" aria-selected="false">벌통 2</a>
+                    <a class="nav-item nav-link" id="Module3-tab" data-toggle="tab" href="#Module3" role="tab" aria-controls="Module3" aria-selected="false">벌통 3</a>
+                    <a class="nav-item nav-link" id="Module4-tab" data-toggle="tab" href="#Module4" role="tab" aria-controls="Module4" aria-selected="false">외부</a>
+                    <!-- 아래 하이퍼링크에 벌카운터 주소 넣어야 함 -->
+                    <a class="nav-item nav-link" href="" target="_blank">BeeCounter</a>
+                </nav>
+
+
+                <!--Tab panes-->
+                <div class="tab-content text-center" id="myTabContent">
+                    <div class="tab-pane fade" id="Module1" role="tabpanel" aria-labelledby="Module1-tab">
+                        <?php
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, 'http://kjh1131.dothome.co.kr/get_data.php');
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        $response = curl_exec($curl);
+                        if ($response === false) {
+                            $error = curl_error($curl);
+                        } else {
+                            $data = json_decode($response, true);
+                        }
+                        curl_close($curl);
+                        ?>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT1_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_1"]["sensor1"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_1"]["sensor1"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="dht_table_1_1.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT1_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_1"]["sensor2"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_1"]["sensor2"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="dht_table_1_2.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT1_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_1"]["sensor3"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_1"]["sensor3"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="dht_table_1_3.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 온/습도 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="dht_graph_1.html" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ1_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <a> CO2 : <?php echo $data["DEVICE_1"]["sensor1"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="mq_table_1_1.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ1_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <a> CO2 : <?php echo $data["DEVICE_1"]["sensor2"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="mq_table_1_2.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ1_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <a> CO2 : <?php echo $data["DEVICE_1"]["sensor3"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="mq_table_1_3.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 대기질 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br>
+                                        <br><a href="mq_graph_1.html" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게 센서</div>
+                                    <div class="card-body">
+                                        <h class="card-title">Weight_Sensor</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/weight.png"/></h5>
+                                        <!-- 무게 데이터 불러오는 코드 추가하고, get_data.php 에도 무게 데이터 받아오는 코드 추가해야함 -->
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_1"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 무게센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게센서 그래프</div>
+                                        <div class="card-body">
+                                            <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                            <br><br><br><br><br>
+                                            <br><a href="mq_graph_error_correction.php" class="btn btn-warning text-white">그래프</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    <!--Tab panes-->
+                    <div class="tab-pane fade" id="Module2" role="tabpanel" aria-labelledby="Module2-tab">
+                        <?php
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, 'http://kjh1131.dothome.co.kr/get_data.php');
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        $response = curl_exec($curl);
+                        if ($response === false) {
+                            $error = curl_error($curl);
+                        } else {
+                            $data = json_decode($response, true);
+                        }
+                        curl_close($curl);
+                        ?>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT2_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_2"]["sensor1"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_2"]["sensor1"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT2_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_2"]["sensor2"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_2"]["sensor2"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT2_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_2"]["sensor3"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_2"]["sensor3"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 온/습도 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="dht_graph_2.html" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ2_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_2"]["sensor1"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ2_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_2"]["sensor2"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ2_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_2"]["sensor3"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_2"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 대기질 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게 센서</div>
+                                    <div class="card-body">
+                                        <h class="card-title">Weight_Sensor</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/weight.png"/></h5>
+                                        <!-- 무게센서 데이터 추가해야함 -->
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 무게센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게센서 그래프</div>
+                                        <div class="card-body">
+                                            <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                            <br><br><br>
+                                            <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    <!--Tab panes-->
+                    <div class="tab-pane fade" id="Module3" role="tabpanel" aria-labelledby="Module3-tab">
+                        <?php
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, 'http://kjh1131.dothome.co.kr/get_data.php');
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        $response = curl_exec($curl);
+                        if ($response === false) {
+                            $error = curl_error($curl);
+                        } else {
+                            $data = json_decode($response, true);
+                        }
+                        curl_close($curl);
+                        ?>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT3_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_3"]["sensor1"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_3"]["sensor1"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT3_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_3"]["sensor2"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_3"]["sensor2"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT3_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_3"]["sensor3"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_3"]["sensor3"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 온/습도 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="dht_graph_3.html" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 1</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ3_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_3"]["sensor1"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 2</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ3_2</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_3"]["sensor2"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor2"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 3</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ3_3</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_3"]["sensor3"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor3"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <!-- 대기질 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게 센서</div>
+                                    <div class="card-body">
+                                        <h class="card-title">Weight_Sensor</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/weight.png"/></h5>
+
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 무게센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">무게센서 그래프</div>
+                                        <div class="card-body">
+                                            <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                            <br><br><br>
+                                            <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    
+                    <!--Tab panes-->
+                    <div class="tab-pane fade" id="Module4" role="tabpanel" aria-labelledby="Module4-tab">
+                        <?php
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, 'http://kjh1131.dothome.co.kr/get_data.php');
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        $response = curl_exec($curl);
+                        if ($response === false) {
+                            $error = curl_error($curl);
+                        } else {
+                            $data = json_decode($response, true);
+                        }
+                        curl_close($curl);
+                        ?>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 외부</div>
+                                    <div class="card-body">
+                                        <h class="card-title">DHT4_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/000000/temperature-inside.png"/></h5>
+                                        <a> 온도 : <?php echo $data["DEVICE_4"]["sensor1"]["temperature"]; ?> °C</a>
+                                        <br><a> 습도 : <?php echo $data["DEVICE_4"]["sensor1"]["humidity"]; ?> %</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_4"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 온/습도 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">온/습도센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="dht_graph_4.html" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 외부</div>
+                                    <div class="card-body">
+                                        <h class="card-title">MQ4_1</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/co2-gauge.png"/></h5>
+                                        <br><a> CO2 : <?php echo $data["DEVICE_4"]["sensor1"]["co2"]; ?> ppm</a>
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 대기질 센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">대기질 센서 그래프</div>
+                                    <div class="card-body">
+                                        <br><h5><img src="https://img.icons8.com/ios/50/000000/combo-chart--v1.png"/></h5>
+                                        <br><br><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">풍속 센서</div>
+                                    <div class="card-body">
+                                        <h class="card-title">Wind_Sensor</h>
+                                        <h5><img src="https://img.icons8.com/ios/50/weight.png"/></h5>
+                                        <!-- 풍속 데이터 추가해야하고, get_data.php에 풍속 데이터 받아오는 부분 추가해야함. 데이터베이스에도 추가해야함 -->
+                                        <br><a class="last-update"> Last Update : <?php echo $data["DEVICE_3"]["sensor1"]["timestamp"]; ?></a><br>
+                                        <br><a href="DHTperiod.php" class="btn btn-warning text-white">데이터 테이블</a>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-3">
+                                <!-- 풍속센서 그래프 -->
+                                <div class="card">
+                                    <div class="card-header bg-warning font-weight-bold">풍속센서 그래프</div>
+                                        <div class="card-body">
+                                            <br><h5><img src="https://img.icons8.com/metro/52/air-element.png"/></h5>
+                                            <br><br><br>
+                                            <br><a href="DHTperiod.php" class="btn btn-warning text-white">그래프</a>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('activeTab');
+    
+            // 쿼리 매개변수를 기반으로 활성 탭 선택
+            if (activeTab) {
+                const tabElement = document.getElementById(activeTab + "-tab");
+                if (tabElement) {
+                    tabElement.classList.add('active');
+                    tabElement.setAttribute('aria-selected', 'true');
+    
+                    const tabContentElement = document.getElementById(activeTab);
+                    if (tabContentElement) {
+                        tabContentElement.classList.add('show', 'active');
+                    }
+                }
+            }
+        });
+    </script>
+
+    </body>
+</html>
