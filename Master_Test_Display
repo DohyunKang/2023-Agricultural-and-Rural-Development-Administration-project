@@ -1,0 +1,479 @@
+// 서버 역할에 필요한 헤더파일
+#include <esp_now.h>
+#include <WiFi.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
+
+// Display에 필요한 헤더파일
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET    -1
+#define SCREEN_ADDRESS 0x3C
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+String timeStr;
+String numStr;
+String formattedNum;
+bool dotFlag = false;
+int wifiConnectionFlag = 0;   // 0: Disconnected, 1: Connected, 2: Connecting
+int httpResponseCode = 0;
+int espInformationCode = 0;   // 0: OK, 1: Restart
+int slave1SensorErrorNum = 0; // Slave 1에서 오류가 있는 센서의 개수를 나타냄
+int slave2SensorErrorNum = 0; // Slave 2에서 오류가 있는 센서의 개수를 나타냄
+int slave3SensorErrorNum = 0; // Slave 3에서 오류가 있는 센서의 개수를 나타냄
+
+const char* ssid = " ";
+const char* password = " ";
+const char* serverUrl = " ";
+const char* deviceName = "DEVICE_1";
+
+struct __attribute__((packed)) mac_addr_t {
+  uint8_t mac[6];
+};
+
+mac_addr_t slave1 = {{0xB0, 0xA7, 0x32, 0xC8, 0x19, 0xBC}};
+mac_addr_t slave2 = {{0xB0, 0xA7, 0x32, 0xC8, 0x16, 0x1C}};
+mac_addr_t slave3 = {{0xB0, 0xA7, 0x32, 0xC8, 0x1A, 0x98}};
+
+bool masterDataSend = false;
+bool slave1DataRecieved = false;
+bool slave2DataRecieved = false;
+bool slave3DataRecieved = false;
+unsigned long slave1RecievedTime = 0;
+unsigned long slave2RecievedTime = 0;
+unsigned long slave3RecievedTime = 0;
+unsigned long masterSentTime = 0;
+unsigned long currentMillis = 0;
+unsigned long displayUpdateTime = 0;
+unsigned long wifiConnectTime = 0;
+
+
+// Slave 데이터 전송 주기 (연결 끊김 판별용)
+const int SLAVE_TRANSMISSON_INTERVAL = 10000;
+
+// 데이터 서버 전송 주기
+const int MASTER_TRANSMISSION_INTERVAL = 20000;
+
+// Wifi 연결 대기 시간 (이 시간 초과하면 재부팅)
+const int WIFI_CONNECTION_TIME = 10000;
+
+// 디스플레이 새로고침 주기
+const int DISPLAY_UPDATE_INTERVAL = 50;
+
+// Slave 로부터 받은 데이터
+struct SensorData {
+  int8_t id;
+  int16_t temperature;
+  int16_t humidity;
+};
+
+// 서버로 보낼 데이터
+typedef struct SendData {
+  int deviceNum;
+  int boardNum;
+  int id;
+  float tmp;
+  float hum;
+}SendData;
+
+esp_now_peer_info_t peerInfo;
+WiFiClient cilent;
+
+SensorData receivedData[24];
+SendData sendData[72];
+
+void setup() {
+  espInformationCode = 0;
+
+  Serial.begin(115200);
+
+  // wifi mode 설정
+  WiFi.mode(WIFI_AP_STA);
+
+  // esp-now 초기설정
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error Initializing ESP_NOW");
+    return;
+  } else {
+    Serial.println("ESP-OK");
+  }
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+  display.clearDisplay();
+
+  display.drawPixel(10, 10, SSD1306_WHITE);
+  display.display();
+
+  // 패킷 수신 상태를 보기 위한 콜백함수 지정
+  esp_now_register_recv_cb(OnDataReceived);
+
+
+}
+
+void loop() {
+  // 일정 시간마다 서버에 업로드 하는 코드 추가 필요
+  currentMillis = millis();
+  espInformationCode = 0;
+
+  //모든 Slave 로부터 데이터를 전송받은 경우 전송 주기에 맞춰 전송
+  if (slave1DataRecieved && slave2DataRecieved && slave3DataRecieved && (currentMillis - masterSentTime > MASTER_TRANSMISSION_INTERVAL)){
+    Serial.println("All Data Recieved");
+    masterDataSend = true;
+  }
+
+  // 모든 Slave 로부터 데이터를 전송받지 못해도, 전송 주기가 지나면 오류값을 포함해 전송 
+  else if ((currentMillis - slave1RecievedTime > MASTER_TRANSMISSION_INTERVAL ||
+            currentMillis - slave2RecievedTime > MASTER_TRANSMISSION_INTERVAL ||
+            currentMillis - slave3RecievedTime > MASTER_TRANSMISSION_INTERVAL ) &&
+            currentMillis - masterSentTime > MASTER_TRANSMISSION_INTERVAL) {
+    if (!slave1DataRecieved){
+      Serial.println("Slave_1 Data Not Recieved");
+      for ( int i = 0; i < 24; i++){
+        sendData[i].boardNum = 1;
+        sendData[i].id = i;
+        sendData[i].tmp = -999;
+        sendData[i].hum = -999;
+      }
+    }
+    if (!slave2DataRecieved){
+      Serial.println("Slave_2 Data Not Recieved");
+      for ( int i = 0; i < 24; i++){
+        sendData[i + 24].boardNum = 2;
+        sendData[i + 24].id = i;
+        sendData[i + 24].tmp = -999;
+        sendData[i + 24].hum = -999;
+      }
+    }
+    if (!slave3DataRecieved){
+      Serial.println("Slave_3 Data Not Recieved");
+      for ( int i = 0; i < 24; i++){
+        sendData[i + 48].boardNum = 2;
+        sendData[i + 48].id = i;
+        sendData[i + 48].tmp = -999;
+        sendData[i + 48].hum = -999;
+      }
+    }
+    masterDataSend = true;
+  }
+
+  if(masterDataSend){
+    Serial.println("Send Data to Server...");
+    //serverSendDataPrint();
+    serverSendData();
+
+    slave1DataRecieved = false;
+    slave2DataRecieved = false;
+    slave3DataRecieved = false;
+    masterDataSend = false;
+    masterSentTime = millis();
+  }
+
+  // 무게감지 코드 추가 필요
+
+  if (currentMillis - displayUpdateTime > DISPLAY_UPDATE_INTERVAL){
+    drawInformation();
+    displayUpdateTime = millis();
+  }
+
+}
+
+void OnDataReceived(const uint8_t *mac_addr, const uint8_t *data, int len) {
+  if (len == sizeof(receivedData)) {
+    int slaveNum = 0;
+    // 어떤 Slave에서 데이터를 받았는지 판별하는 코드
+    if (memcmp(mac_addr, slave1.mac, 6) == 0) {
+      slaveNum = 1;
+      slave1DataRecieved = true;
+      slave1RecievedTime = millis();
+    } else if (memcmp(mac_addr, slave2.mac, 6) == 0) {
+      slaveNum = 2;
+      slave2DataRecieved = true;
+      slave2RecievedTime = millis();
+    } else if (memcmp(mac_addr, slave3.mac, 6) == 0) {
+      slaveNum = 3;
+      slave3DataRecieved = true;
+      slave3RecievedTime = millis();
+    }
+
+    Serial.print("Data received from a slave : ");
+    Serial.println(slaveNum);
+
+    memcpy(&receivedData, data, len);
+
+    int j=0;
+    for (int i = ((slaveNum-1)*24); i < (24 + (slaveNum-1)*24); i++){
+      sendData[i].deviceNum = slaveNum;
+      sendData[i].boardNum = (i / 8) % 3 + 1;
+      sendData[i].id = (receivedData[j].id - 1) % 8 + 1;
+      sendData[i].tmp = receivedData[j].temperature / 10.0;
+      sendData[i].hum = receivedData[j].humidity / 10.0;
+      j++;
+    }
+  } 
+  else {
+    Serial.println("Received data length is incorrect");
+  }
+}
+
+void serverSendDataPrint(){
+  for (int i = 0; i<72; i++){
+    Serial.print("Device_num : ");
+    Serial.print(sendData[i].deviceNum);
+    Serial.print("\tBoard_num : ");
+    Serial.print(sendData[i].boardNum);
+    Serial.print("\tSensor_num : ");
+    Serial.print(sendData[i].id);
+    Serial.print("\tTemperature : ");
+    Serial.print(sendData[i].tmp);
+    Serial.print("\tHumidity : ");
+    Serial.print(sendData[i].hum);
+    Serial.println();
+  }
+}
+
+void serverSendData(){
+  DynamicJsonDocument jsonDocument(8192);
+  jsonDocument["device_name"] = deviceName;
+  JsonArray sensorArray = jsonDocument.createNestedArray("sensors");
+  WiFi.mode(WIFI_STA);
+
+  slave1SensorErrorNum = 0;
+  slave2SensorErrorNum = 0;
+  slave3SensorErrorNum = 0;
+
+  for (int i = 0; i< 72; i++){
+
+    // 정상적인 값만 서버에 전송하는 코드
+    if(sendData[i].tmp > -99 && sendData[i].hum > -99){
+      JsonObject sensorObject = sensorArray.createNestedObject();
+      sensorObject["device_number"] = sendData[i].deviceNum;
+      sensorObject["board_number"] = sendData[i].boardNum;
+      sensorObject["sensor_number"] = sendData[i].id;
+      sensorObject["temperature"] = sendData[i].tmp;
+      sensorObject["humidity"] = sendData[i].hum;
+      // sensorObject["kg"] = result - tare;
+    } else {
+      switch(sendData[i].deviceNum){
+        case 1:
+          slave1SensorErrorNum ++;
+          break;
+        case 2:
+          slave2SensorErrorNum ++;
+          break;
+        case 3:
+          slave3SensorErrorNum ++;
+          break;
+      }
+    }
+  }
+  
+
+  String jsonData;
+  serializeJson(jsonDocument, jsonData);
+
+  wifiConnectTime = millis();
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    wifiConnectionFlag = 2;
+    drawInformation();
+    delay(200);
+    if (currentMillis - wifiConnectTime > WIFI_CONNECTION_TIME){
+      espInformationCode = 1;
+      Serial.println("Resetting...");
+      drawInformation();
+      esp_restart();
+    }
+  }
+  Serial.println();
+  Serial.println("Connected to WiFi...");
+  wifiConnectionFlag = 1;
+  drawInformation();
+
+  HTTPClient http;
+  http.begin(serverUrl);
+  http.addHeader("Content-Type", "application/json");
+
+  httpResponseCode = http.POST(jsonData);
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println("HTTP Response Code: " + String(httpResponseCode));
+    //Serial.println(response);
+  } else {
+    espInformationCode = 1;
+    Serial.println("Resetting...");
+    drawInformation;
+    Serial.print("HTTP Error: ");
+    Serial.println(httpResponseCode);
+    esp_restart();
+  }
+
+  WiFi.disconnect();
+  Serial.println("Disconnected from Wi-Fi...");
+  wifiConnectionFlag = 0;
+  WiFi.mode(WIFI_OFF);
+  delay(100);
+  WiFi.mode(WIFI_AP_STA);
+  delay(100);
+
+  http.end();
+}
+
+
+void drawInformation() {
+  currentMillis = millis();
+  
+  display.clearDisplay();
+
+  if(dotFlag){
+    display.drawPixel(127, 63, SSD1306_WHITE);
+    dotFlag = false;
+  }
+  else{
+    dotFlag = true;
+  }
+  
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println("MASTER:RUN");
+
+  display.setTextSize(1);
+
+  display.setCursor(4,17);
+  if(slave1DataRecieved || currentMillis - slave1RecievedTime < SLAVE_TRANSMISSON_INTERVAL){
+    display.print("S1   : Connected ");
+    if(slave1SensorErrorNum > 0){
+      display.setCursor(116, 17);
+      numStr = String(slave1SensorErrorNum);
+      if(numStr.length() < 2){
+        numStr = " " + numStr;
+      }
+      display.print(numStr);
+    }
+  }
+  else{
+    display.print("S1   : Disconn. ");
+    display.setCursor(97,17);
+    int timeValue = int((currentMillis - slave1RecievedTime) / 1000);
+    if(timeValue > 9999){
+      timeValue = 9999;
+    }
+    timeStr = String(timeValue);
+    while(timeStr.length() < 4){
+      timeStr = " " + timeStr;
+    }
+    timeStr += "s";
+    display.print(timeStr);
+  }
+
+  display.setCursor(4,27);
+  if(slave2DataRecieved || currentMillis - slave2RecievedTime < SLAVE_TRANSMISSON_INTERVAL){
+    display.print("S2   : Connected ");
+    if(slave2SensorErrorNum > 0){
+      display.setCursor(116, 27);
+      numStr = String(slave2SensorErrorNum);
+      if(numStr.length() < 2){
+        numStr = " " + numStr;
+      }
+      display.print(numStr);
+    }
+  }
+  else{
+    display.print("S2   : Disconn. ");
+    display.setCursor(97,27);
+    int timeValue = int((currentMillis - slave2RecievedTime) / 1000);
+    if(timeValue > 9999){
+      timeValue = 9999;
+    }
+    timeStr = String(timeValue);
+    while(timeStr.length() < 4){
+      timeStr = " " + timeStr;
+    }
+    timeStr += "s";
+    display.print(timeStr);
+  }
+
+  display.setCursor(4,37);
+  if(slave3DataRecieved || currentMillis - slave3RecievedTime < SLAVE_TRANSMISSON_INTERVAL){
+    display.print("S3   : Connected ");
+    if(slave3SensorErrorNum > 0){
+      display.setCursor(116, 37);
+      numStr = String(slave3SensorErrorNum);
+      if(numStr.length() < 2){
+        numStr = " " + numStr;
+      }
+      display.print(numStr);
+    }
+  }
+  else{
+    display.print("S3   : Disconn. ");
+    display.setCursor(97,37);
+    int timeValue = int((currentMillis - slave3RecievedTime) / 1000);
+    if(timeValue > 9999){
+      timeValue = 9999;
+    }
+    timeStr = String(timeValue);
+    while(timeStr.length() < 4){
+      timeStr = " " + timeStr;
+    }
+    timeStr += "s";
+    display.print(timeStr);
+  }
+
+  display.setCursor(4,47);
+  switch(wifiConnectionFlag){
+    case 0:
+      display.println("Wi-Fi: Disconnected");
+      break;
+    case 1:
+      display.println("Wi-Fi: Connected");
+      break;
+    case 2:
+      display.println("Wi-Fi: Connecting");
+      display.setCursor(104,47);
+      timeStr = String((currentMillis - wifiConnectTime)/1000);
+      while(timeStr.length() < 3){
+        timeStr = " " + timeStr;
+      }
+      formattedNum = timeStr + "s";
+      display.print(formattedNum);
+      break;
+  }
+
+  display.setCursor(4,57);
+  display.print("HTTP : ");
+  display.print(httpResponseCode);
+
+  if(espInformationCode == 1){
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(0, 0);
+    display.println("MASTER:RST");
+
+    display.setTextSize(1);
+    display.setCursor(4,17);
+    display.println("Resetting ESP for ");
+    display.println("fix WIFI");
+    display.println("Wait a moment...");
+
+  }
+
+
+
+
+  display.display();
+}
+
+
+
+
+
