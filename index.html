@@ -1,0 +1,136 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Honey Bee Sensor Data</title>
+    <meta http-equiv="refresh" content="60*10"> <!--10min-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="navbar.css">
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/circular-bar.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        p {
+            margin: 5px 0px;
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        div[class^="col"] {
+            padding: 20px;
+            border: 1px solid #FFFFFF;
+            background-color: #ffffff;
+        }
+
+        .nav-pills>.nav-item>.active {
+            color: rgb(255, 255, 255) !important;
+        }
+    </style>
+
+    <div class="container text-right rounded font-weight-bold">
+        <p id="show"></p>
+        <script>
+            function d_clock() {
+                var d_t = new Date();
+                var month = d_t.getMonth();
+                var date = d_t.getDate();
+                var day = d_t.getDay();
+                var week = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+                var hours = String(d_t.getHours()).padStart(2, "0");
+                var minutes = String(d_t.getMinutes()).padStart(2, "0");
+                var seconds = String(d_t.getSeconds()).padStart(2, "0");
+                document.getElementById("show").innerHTML = (month + 1) + "/" + date + " " + week[day] + " " + hours + ":" + minutes + ":" + seconds;
+            }
+            d_clock();
+            setInterval(d_clock, 1000);
+        </script>
+    </div>
+</head>
+
+<body>
+    <div class="header">
+        <div class="text-center">
+            </br>
+            <a class="header_ANDONG" href="https://www.andong.ac.kr" target="_blank">
+                <img src="image/andong_univ.jpg" width="auto" height="80" title="안동대학교 홈페이지"></a>
+            </br></br>
+            <!-- 아래 하이퍼링크에 서버 주소 넣어야 함 -->
+            <a class="headr_CRCIV" href="http://kjh1131.dothome.co.kr" target="_blank">
+                <img src="image/Sensor_data.jpg" height="80" width="auto" title="Bee sensor data"></a>
+            </br></br>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+
+                <!--Nav tabs-->
+                <nav class="nav nav-pills nav-fill bg-warning rounded text-center" id="myTab" role="tablist">
+                    <a class="nav-item nav-link active" id="Module1-tab" data-toggle="tab" href="" role="tab"
+                        aria-controls="Module1" aria-selected="true">안동대</a>
+                    <!-- <a class="nav-item nav-link" id="Module2-tab" data-toggle="tab" href="#Module2" role="tab" aria-controls="Module2" aria-selected="false">Tabname1</a> -->
+                    <!-- <a class="nav-item nav-link" id="Module3-tab" data-toggle="tab" href="#Module3" role="tab" aria-controls="Module3" aria-selected="false">Tabname2</a> -->
+                    <!-- 아래 하이퍼링크에 벌카운터 주소 넣어야 함 -->
+                    <a class="nav-item nav-link" href="" target="_blank">BeeCounter</a>
+                </nav>
+
+                <!--Tab panes-->
+                <div class="tab-content text-center" id="myTabContent">
+                    <div class="tab-pane fade show active" id="Module1" role="tabpanel" aria-labelledby="Module1-tab">
+                        <!--<br><a> Master mac address is "" </a><br>-->
+                        <div class="row">
+                            <!-- 첫 번째 줄 -->
+                            <div class="col-md-4">
+                                <a href="box.html?activeTab=Module1" class="card bg-warning btn" style="height: 200px;">
+                                    <div class="card-header bg-warning font-weight-bold">벌통 1</div>
+                                    <!-- <div class="card-body"> -->
+                                        <!-- 버튼 내용 -->
+                                    <!-- </div> -->
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="box.html?activeTab=Module2" class="card bg-warning btn" style="height: 200px;">
+                                    <div class="card-header bg-warning font-weight-bold">벌통 2</div>
+                                    <!-- <div class="card-body"> -->
+                                        <!-- 버튼 내용 -->
+                                    <!-- </div> -->
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="box.html?activeTab=Module3" class="card bg-warning btn" style="height: 200px;">
+                                    <div class="card-header bg-warning font-weight-bold">벌통 3</div>
+                                    <!-- <div class="card-body"> -->
+                                        <!-- 버튼 내용 -->
+                                    <!-- </div> -->
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="box.html?activeTab=Module4" class="card bg-warning btn" style="height: 200px;">
+                                    <div class="card-header bg-warning font-weight-bold">외부</div>
+                                    <!-- <div class="card-body"> -->
+                                        <!-- 버튼 내용 -->
+                                    <!-- </div> -->
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
