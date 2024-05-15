@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Display</title>
+    <style>
+        .device-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .device-box {
+            width: 30%;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .sensor-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .sensor {
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+            padding: 5px;
+            background-color: #e0e0e0;
+            margin-right: 10px;
+        }
+        .timestamp {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Display</h1>
+
+    <div class="device-container">
+        <div class="device-box">
+            <h2>Device 1</h2>
+            <div class="sensor-box">
+                <div class="sensor">
+                    <div id="device1-sensor1-temperature"></div>
+                    <div id="device1-sensor1-co2"></div>
+                    <div id="device1-sensor1-wind_velocity"></div>
+                    <div class="timestamp" id="device1-sensor1-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device1-sensor2-temperature"></div>
+                    <div id="device1-sensor2-co2"></div>
+                    <div id="device1-sensor2-wind_velocity"></div>
+                    <div class="timestamp" id="device1-sensor2-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device1-sensor3-temperature"></div>
+                    <div id="device1-sensor3-co2"></div>
+                    <div id="device1-sensor3-wind_velocity"></div>
+                    <div class="timestamp" id="device1-sensor3-timestamp"></div>
+                </div>
+            </div>
+        </div>
+        <div class="device-box">
+            <h2>Device 2</h2>
+            <div class="sensor-box">
+                <div class="sensor">
+                    <div id="device2-sensor1-temperature"></div>
+                    <div id="device2-sensor1-co2"></div>
+                    <div id="device2-sensor1-wind_velocity"></div>
+                    <div class="timestamp" id="device2-sensor1-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device2-sensor2-temperature"></div>
+                    <div id="device2-sensor2-co2"></div>
+                    <div id="device2-sensor2-wind_velocity"></div>
+                    <div class="timestamp" id="device2-sensor2-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device2-sensor3-temperature"></div>
+                    <div id="device2-sensor3-co2"></div>
+                    <div id="device2-sensor3-wind_velocity"></div>
+                    <div class="timestamp" id="device2-sensor3-timestamp"></div>
+                </div>
+            </div>
+        </div>
+        <div class="device-box">
+            <h2>Device 3</h2>
+            <div class="sensor-box">
+                <div class="sensor">
+                    <div id="device3-sensor1-temperature"></div>
+                    <div id="device3-sensor1-co2"></div>
+                    <div id="device3-sensor1-wind_velocity"></div>
+                    <div class="timestamp" id="device3-sensor1-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device3-sensor2-temperature"></div>
+                    <div id="device3-sensor2-humidity"></div>
+                    <div id="device3-sensor2-co2"></div>
+                    <div id="device3-sensor2-wind_velocity"></div>
+                    <div class="timestamp" id="device3-sensor2-timestamp"></div>
+                </div>
+                <div class="sensor">
+                    <div id="device3-sensor3-temperature"></div>
+                    <div id="device3-sensor3-co2"></div>
+                    <div id="device3-sensor3-wind_velocity"></div>
+                    <div class="timestamp" id="device3-sensor3-timestamp"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AJAX를 사용하여 서버에서 데이터 가져오기
+        function getData() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var data = JSON.parse(this.responseText);
+                    updateData(data);
+                }
+            };
+            xhttp.open("GET", "http://kjh1131.dothome.co.kr/get_data.php", true);
+            xhttp.send();
+        }
+
+        // 데이터 업데이트 함수
+        function updateData(data) {
+            // Device 1 데이터 업데이트
+            updateSensorData(data.DEVICE_1.sensor1, 'device1-sensor1');
+            updateSensorData(data.DEVICE_1.sensor2, 'device1-sensor2');
+            updateSensorData(data.DEVICE_1.sensor3, 'device1-sensor3');
+
+            // Device 2 데이터 업데이트
+            updateSensorData(data.DEVICE_2.sensor1, 'device2-sensor1');
+            updateSensorData(data.DEVICE_2.sensor2, 'device2-sensor2');
+            updateSensorData(data.DEVICE_2.sensor3, 'device2-sensor3');
+
+            // Device 3 데이터 업데이트
+            updateSensorData(data.DEVICE_3.sensor1, 'device3-sensor1');
+            updateSensorData(data.DEVICE_3.sensor2, 'device3-sensor2');
+            updateSensorData(data.DEVICE_3.sensor3, 'device3-sensor3');
+        }
+
+        // 센서 데이터 업데이트 함수
+        function updateSensorData(sensorData, sensorId) {
+            if (sensorData) {
+                document.getElementById(sensorId + '-temperature').textContent = 'Temperature: ' + sensorData.temperature + '°C';
+                document.getElementById(sensorId + '-co2').textContent = 'CO2: ' + sensorData.co2;
+                document.getElementById(sensorId + '-wind_velocity').textContent = 'Wind Velocity: ' + sensorData.wind_velocity + 'm/s';
+                document.getElementById(sensorId + '-timestamp').textContent = sensorData.timestamp;
+            }
+        }
+
+        // 초기 데이터 가져오기
+        getData();
+
+        // 일정 간격으로 데이터 업데이트
+        setInterval(getData, 5000); // 5초마다 업데이트 (원하는 주기로 변경 가능)
+    </script>
+</body>
+</html>
