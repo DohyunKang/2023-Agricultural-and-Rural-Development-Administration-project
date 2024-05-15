@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            <?php
+            $servername = "localhost";
+            $username = " ";
+            $password = " ";
+            $dbname = " ";
+
+            $conn = new mysqli($servername, $username, $password, $dbname);
+
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            $deviceName = "DEVICE_1"; // 필터링할 디바이스 이름
+
+            $sql = "SELECT device_name, sensor_number, co2, timestamp FROM sensor_data WHERE device_name = '$deviceName'";
+            $result = $conn->query($sql);
+
+            $data = array();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $sensor_number = $row['sensor_number'];
+                    $timestamp = $row['timestamp'];
+
+                    if (!isset($data[$sensor_number])) {
+                        $data[$sensor_number] = array();
+                    }
+
+                    $data[$sensor_number][$timestamp] = array(
+                        'device_name' => $row['device_name'],
+                        'co2' => $row['co2']
+                    );
+                }
+
+                foreach ($data as &$sensor) {
+                    ksort($sensor);
+                }
+            }
+
+            $conn->close();
+            ?>
+
+            <?php
+            foreach ($data as $sensorNumber => $sensor) {
+                echo "var data_$sensorNumber = new google.visualization.DataTable();";
+                echo "data_$sensorNumber.addColumn('string', 'Timestamp');";
+                echo "data_$sensorNumber.addColumn('number', 'CO2');";
+                echo "data_$sensorNumber.addRows([";
+                foreach ($sensor as $timestamp => $values) {
+                    $co2 = $values['co2'];
+                    echo "['$timestamp', $co2],";
+                }
+                echo "]);";
+
+                echo "var options_$sensorNumber = {";
+                echo "title: 'CO2 Sensor Data - Sensor $sensorNumber',";
+                echo "curveType: 'function',";
+                echo "legend: {position: 'bottom'}";
+                echo "};";
+
+                echo "var chart_$sensorNumber = new google.visualization.LineChart(document.getElementById('chart_div_$sensorNumber'));";
+                echo "chart_$sensorNumber.draw(data_$sensorNumber, options_$sensorNumber);";
+            }
+            ?>
+        }
+    </script>
+</head>
+<body>
+    <?php
+    foreach ($data as $sensorNumber => $sensor) {
+        echo "<div id='chart_div_$sensorNumber' style='width: 900px; height: 500px;'></div>";
+    }
+    ?>
+</body>
+</html>
