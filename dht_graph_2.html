@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            <?php
+            $servername = "localhost";
+            $username = "kjh1131";
+            $password = "rlawlsgk13!#";
+            $dbname = "kjh1131";
+
+            $conn = new mysqli($servername, $username, $password, $dbname);
+
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            $deviceName = "DEVICE_2"; // 필터링할 디바이스 이름
+
+            $sql = "SELECT device_name, sensor_number, temperature, humidity, timestamp FROM sensor_data WHERE device_name = '$deviceName'";
+            $result = $conn->query($sql);
+
+            $data = array();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $sensor_number = $row['sensor_number'];
+                    $timestamp = $row['timestamp'];
+
+                    if (!isset($data[$sensor_number])) {
+                        $data[$sensor_number] = array();
+                    }
+
+                    $data[$sensor_number][$timestamp] = array(
+                        'device_name' => $row['device_name'],
+                        'temperature' => $row['temperature'],
+                        'humidity' => $row['humidity']
+                    );
+                }
+
+                foreach ($data as &$sensor) {
+                    ksort($sensor);
+                }
+            }
+
+            $conn->close();
+            ?>
+
+            <?php
+            foreach ($data as $sensorNumber => $sensor) {
+                echo "var data_$sensorNumber = new google.visualization.DataTable();";
+                echo "data_$sensorNumber.addColumn('string', 'Timestamp');";
+                echo "data_$sensorNumber.addColumn('number', 'Temperature', null, { 'style': 'color: red' });";
+                echo "data_$sensorNumber.addColumn('number', 'Humidity', null, { 'style': 'color: blue' });";
+                echo "data_$sensorNumber.addRows([";
+                foreach ($sensor as $timestamp => $values) {
+                    $temperature = $values['temperature'];
+                    $humidity = $values['humidity'];
+                    echo "['$timestamp', $temperature, $humidity],";
+                }
+                echo "]);";
+
+                echo "var options_$sensorNumber = {";
+                echo "title: 'DHT Sensor Data - Sensor $sensorNumber',";
+                echo "curveType: 'function',";
+                echo "legend: {position: 'bottom'},";
+                echo "series: {";
+                echo "0: {color: 'red'},";
+                echo "1: {color: 'blue'}";
+                echo "}";
+                echo "};";
+
+                echo "var chart_$sensorNumber = new google.visualization.LineChart(document.getElementById('chart_div_$sensorNumber'));";
+                echo "chart_$sensorNumber.draw(data_$sensorNumber, options_$sensorNumber);";
+            }
+            ?>
+        }
+    </script>
+</head>
+<body>
+    <?php
+    foreach ($data as $sensorNumber => $sensor) {
+        echo "<div id='chart_div_$sensorNumber' style='width: 900px; height: 500px;'></div>";
+    }
+    ?>
+</body>
+</html>
