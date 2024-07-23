@@ -15,7 +15,7 @@
 ## 설치 및 실행 방법
 
 1. **Arduino 설정**:
-    - Arduino에 온도, 습도, 로드셀 센서를 연결합니다.
+    - Arduino(esp32)에 온도, 습도, 로드셀 센서를 연결합니다.
     - 적절한 코드를 작성하여 센서 데이터를 읽고, 이를 시리얼 통신을 통해 전송합니다.
 
 2. **서버 설정**:
@@ -39,7 +39,7 @@
 
 ### 메인 페이지
 
-#### 1.Bee Counter
+#### 1. Bee Counter
 <img width="700" alt="2" src="https://private-user-images.githubusercontent.com/166014987/351328478-c51c6b14-0f60-4ca3-88c3-67f3b11befcd.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjE3Mzg5OTgsIm5iZiI6MTcyMTczODY5OCwicGF0aCI6Ii8xNjYwMTQ5ODcvMzUxMzI4NDc4LWM1MWM2YjE0LTBmNjAtNGNhMy04OGMzLTY3ZjNiMTFiZWZjZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNzIzJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDcyM1QxMjQ0NThaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mYWRlMjEzNjU3M2Q3MWU1MzhiMDAzNTRjMGNkNTJiNGY3NTY0MGMyZTVjODJjODk5YTFjZmQ4ODVlM2MxM2M1JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.W0UtX3UGiCJP-x6BlbDJCJEGGFeaj5WMom3hTAwQFsQ">
 
 #### 2. 목록
