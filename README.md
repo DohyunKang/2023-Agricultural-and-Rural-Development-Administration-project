@@ -36,13 +36,13 @@
 ## 웹사이트 주요 화면
 
 ### 메인 페이지
-
+<img width="700" alt="2" src="[https://user-images.githubusercontent.com](https://github.com/DohyunKang/2023-Agricultural-and-Rural-Development-Administration-project/issues/2)">      
 
 ### 센서 데이터 그래프
 
 
 ### 비 카운터
- <img width="700" alt="2" src="https://user-images.githubusercontent.com/55148494/121532534-636e0280-ca3a-11eb-9326-a96613e89fe5.JPG">      
+
 
 ### 실시간 이미지
 
