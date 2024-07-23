@@ -1,8 +1,11 @@
 # INU Sensor Data Project
 
+## INU <img width="700" alt="2" src="https://github.com/user-attachments/assets/5d266d9b-f385-48d3-bcb5-810d7792e60d">
+## 안동대학교 <img width="700" alt="2" src="https://github.com/user-attachments/assets/124728ac-dd6e-468f-ba57-ccea4efa6d79">
+
 ## 프로젝트 설명
 
-이 프로젝트는 Arduino를 사용하여 벌집의 온도와 습도, 로드셀을 이용한 무게 변화를 측정하고, PHP와 MySQL 데이터베이스를 통해 실시간으로 1분마다 웹사이트에 측정값을 저장하는 시스템입니다. 
+이 프로젝트는 Arduino(esp32)와 DHT33, MQ135, 로드셀 센서를 사용하여 벌집의 온도와 습도, 무게 변화를 측정하고, PHP와 MySQL 데이터베이스를 통해 실시간으로 1분마다 웹사이트에 측정값을 저장하는 시스템입니다. 
 
 ## 주요 기능
 
