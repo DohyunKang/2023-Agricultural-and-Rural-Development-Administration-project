@@ -1,6 +1,6 @@
 # INU Sensor Data Project
 
-## <img width="200" alt="2" src="https://github.com/user-attachments/assets/5d266d9b-f385-48d3-bcb5-810d7792e60d"> img width="200" alt="2" src="https://github.com/user-attachments/assets/124728ac-dd6e-468f-ba57-ccea4efa6d79">
+## <img width="200" alt="2" src="https://github.com/user-attachments/assets/5d266d9b-f385-48d3-bcb5-810d7792e60d"> ## <img width="200" alt="2" src="https://github.com/user-attachments/assets/124728ac-dd6e-468f-ba57-ccea4efa6d79">
 
 ## 프로젝트 설명
 
