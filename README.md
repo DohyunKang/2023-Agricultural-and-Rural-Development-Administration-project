@@ -42,7 +42,7 @@
 
 
 ### 비 카운터
-
+ <img width="700" alt="2" src="https://user-images.githubusercontent.com/55148494/121532534-636e0280-ca3a-11eb-9326-a96613e89fe5.JPG">      
 
 ### 실시간 이미지
 
