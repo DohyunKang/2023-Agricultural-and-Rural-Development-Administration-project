@@ -36,34 +36,22 @@
 ## 웹사이트 주요 화면
 
 ### 메인 페이지
-![메인 페이지](file-XgOzVJ9PibDOcXVHjJ9uTeEc)
+
 
 ### 센서 데이터 그래프
-![센서 데이터 그래프](file-k3KDgL4vun0Svxnd01IuzNMT)
+
 
 ### 비 카운터
-![비 카운터](file-oFH2Oit6J7TgJ89fAYpI8dSd)
+
 
 ### 실시간 이미지
-![실시간 이미지](file-S45CM8tW6ppWBSlhb8aaPmw3)
+
 
 ### 센서 데이터 테이블
-![센서 데이터 테이블](file-sthjz4sKEgXS97JK9xBu8Dt6)
+
 
 ## 기술 스택
 
-- **하드웨어**: Arduino, 온도 및 습도 센서, 로드셀
+- **하드웨어**: Arduino(esp32), 온도 및 습도 센서(dht33), co2 측정 센서(MQ135), 로드셀
 - **백엔드**: PHP, MySQL
 - **프론트엔드**: HTML, CSS, JavaScript
-
-## 기여 방법
-
-1. 이 저장소를 포크합니다.
-2. 새로운 브랜치를 생성합니다. (`git checkout -b feature/새로운기능`)
-3. 변경 사항을 커밋합니다. (`git commit -am 'Add 새로운기능'`)
-4. 브랜치에 푸시합니다. (`git push origin feature/새로운기능`)
-5. 풀 리퀘스트를 생성합니다.
-
-## 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
