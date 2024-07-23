@@ -38,21 +38,33 @@
 ### 메인 페이지
 <img width="700" alt="2" src="https://private-user-images.githubusercontent.com/166014987/351328478-c51c6b14-0f60-4ca3-88c3-67f3b11befcd.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjE3Mzg5OTgsIm5iZiI6MTcyMTczODY5OCwicGF0aCI6Ii8xNjYwMTQ5ODcvMzUxMzI4NDc4LWM1MWM2YjE0LTBmNjAtNGNhMy04OGMzLTY3ZjNiMTFiZWZjZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNzIzJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDcyM1QxMjQ0NThaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mYWRlMjEzNjU3M2Q3MWU1MzhiMDAzNTRjMGNkNTJiNGY3NTY0MGMyZTVjODJjODk5YTFjZmQ4ODVlM2MxM2M1JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.W0UtX3UGiCJP-x6BlbDJCJEGGFeaj5WMom3hTAwQFsQ">
 
+### 센서 데이터 테이블
 
-<img width="700" alt="2" src="https://github.com/user-attachments/assets/4c732abe-e1a9-4817-b8fb-e4c5b7c077e7">
+#### 온/습도 센서
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/d0aad36e-582c-40b6-ae1c-bae108322e97">
 
+#### CO2 센서
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/250ecef4-5b58-4394-8459-6445b524cfc1">
+
+#### 로드셀
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/baa590e3-5883-4a41-9409-b140bcd24f82">
 
 ### 센서 데이터 그래프
 
+#### 온/습도 센서
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/6e37403b-446d-4814-ada3-484ec32ba7b7">
+
+#### CO2 센서
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/35660691-08bb-473f-95b7-064db1c638b0">
+
+#### 로드셀
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/1dc8237c-832b-4bb4-a989-ca60671fde96">
 
 ### 비 카운터
-
+<img width="700" alt="2" src="">
 
 ### 실시간 이미지
-
-
-### 센서 데이터 테이블
-
+<img width="700" alt="2" src="https://github.com/user-attachments/assets/52843b8c-d6a2-4e8e-9596-fb186127a0ce">
 
 ## 기술 스택
 
