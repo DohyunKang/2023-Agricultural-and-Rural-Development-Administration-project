@@ -40,8 +40,9 @@
 ### 메인 페이지
 
 #### 1. Bee Counter
-<img width="700" alt="2" src="https://private-user-images.githubusercontent.com/166014987/351328478-c51c6b14-0f60-4ca3-88c3-67f3b11befcd.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjE3Mzg5OTgsIm5iZiI6MTcyMTczODY5OCwicGF0aCI6Ii8xNjYwMTQ5ODcvMzUxMzI4NDc4LWM1MWM2YjE0LTBmNjAtNGNhMy04OGMzLTY3ZjNiMTFiZWZjZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNzIzJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDcyM1QxMjQ0NThaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mYWRlMjEzNjU3M2Q3MWU1MzhiMDAzNTRjMGNkNTJiNGY3NTY0MGMyZTVjODJjODk5YTFjZmQ4ODVlM2MxM2M1JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.W0UtX3UGiCJP-x6BlbDJCJEGGFeaj5WMom3hTAwQFsQ">
+<img width="700" alt="2" src=https://github.com/user-attachments/assets/e53c2579-a525-45dc-af2d-70c6bcf48623>
 
+<img width="700" alt="2" src=https://github.com/user-attachments/assets/b981e654-b141-4abd-a336-2ca4f0e9ad8e>
 #### 2. 목록
 <img width="700" alt="2" src="https://github.com/user-attachments/assets/abd9c66c-6aec-4712-96e5-15c22ffd0c2d">
 
