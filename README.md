@@ -76,3 +76,7 @@
 - **하드웨어**: Arduino(esp32), 온도 및 습도 센서(dht33), co2 측정 센서(MQ135), 로드셀
 - **백엔드**: PHP, MySQL
 - **프론트엔드**: HTML, CSS, JavaScript
+
+##참고
+
+- [웹사이트](http://kjh1131.dothome.co.kr/)
