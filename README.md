@@ -79,6 +79,6 @@
 - **백엔드**: PHP, MySQL
 - **프론트엔드**: HTML, CSS, JavaScript
 
-##참고
+## 참고
 
 - [웹사이트](http://kjh1131.dothome.co.kr/)
